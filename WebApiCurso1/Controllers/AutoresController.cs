@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,12 +18,20 @@ namespace WebApiAutores.Controllers
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
+        private readonly IConfiguration configuration;
 
-        public AutoresController(ApplicationDbContext context, IMapper mapper)
+        public AutoresController(ApplicationDbContext context, IMapper mapper, IConfiguration configuration)
         {
             this.context = context;
             this.mapper = mapper;
+            this.configuration = configuration;
         }
+
+        //[HttpGet("configuraciones")]
+        //public ActionResult<string>ObtenerConfiguracion()
+        //{
+        //    return configuration["testing"];
+        //}
 
         [HttpGet("{id:int}", Name = "ObtenerAutor")]
         public async Task<ActionResult<AutorDTOConLibros>> Get(int id)
@@ -47,6 +58,7 @@ namespace WebApiAutores.Controllers
         }
 
         [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         //[ServiceFilter(typeof(MiFiltroDeAccion_SoloEjemplo))]
         public async Task<ActionResult<List<AutorOutputDto>>> Get()
         {
